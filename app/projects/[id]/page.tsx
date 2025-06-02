@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, AlertCircle } from "lucide-react"
-import { getProjectById, getDeliveries, getCostCodes, getLocations } from "@/lib/queries"
+import { getProjectById, getDeliveries, getCostCodes, getLocations, getLocationTypes } from "@/lib/queries"
 import Link from "next/link"
 import { ProjectDetailsClient } from "./project-details-client"
 
@@ -47,16 +47,18 @@ export default async function ProjectDetailsPage({ params }: ProjectDetailsPageP
     }
 
     // Try to fetch related data, but don't fail if tables don't exist
-    const [deliveries, costCodes, locations] = await Promise.allSettled([
+    const [deliveries, costCodes, locations, locationTypes] = await Promise.allSettled([
       getDeliveries(params.id),
       getCostCodes(params.id),
       getLocations(params.id),
+      getLocationTypes(),
     ])
 
     // Extract data or use empty arrays if failed
     const deliveriesData = deliveries.status === "fulfilled" ? deliveries.value : []
     const costCodesData = costCodes.status === "fulfilled" ? costCodes.value : []
     const locationsData = locations.status === "fulfilled" ? locations.value : []
+    const locationTypesData = locationTypes.status === "fulfilled" ? locationTypes.value : []
 
     return (
       <ProjectDetailsClient
@@ -64,6 +66,7 @@ export default async function ProjectDetailsPage({ params }: ProjectDetailsPageP
         deliveries={deliveriesData}
         costCodes={costCodesData}
         locations={locationsData}
+        locationTypes={locationTypesData}
       />
     )
   } catch (error) {

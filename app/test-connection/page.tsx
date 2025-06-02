@@ -52,20 +52,22 @@ export default async function TestConnectionPage() {
 
   return (
     <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b border-pathway-gold/20 px-4 bg-pathway-green/5">
         <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <h1 className="text-lg font-semibold">Database Connection Test</h1>
+        <Separator orientation="vertical" className="mr-2 h-4 bg-pathway-gold/30" />
+        <h1 className="text-lg font-semibold text-pathway-green">Database Connection Test</h1>
       </header>
 
       <div className="flex-1 space-y-6 p-6">
-        <Card>
+        <Card className="border-pathway-gold/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-pathway-green">
+              <Database className="h-5 w-5 text-pathway-gold" />
               Supabase Connection Status
             </CardTitle>
-            <CardDescription>Testing connection to carbon_material_tracker database</CardDescription>
+            <CardDescription className="text-pathway-green/70">
+              Testing connection to carbon_material_tracker database
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 mb-4">
@@ -89,7 +91,10 @@ export default async function TestConnectionPage() {
                   {Object.entries(connectionTest.tableCounts).map(([table, count]) => (
                     <div key={table} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                       <span className="font-medium capitalize">{table}</span>
-                      <Badge variant={typeof count === "string" && count.includes("Error") ? "destructive" : "default"}>
+                      <Badge
+                        variant={typeof count === "string" && count.includes("Error") ? "destructive" : "default"}
+                        className="bg-pathway-gold/20 text-pathway-green border-pathway-gold/30"
+                      >
                         {count}
                       </Badge>
                     </div>

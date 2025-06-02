@@ -48,16 +48,19 @@ export default function MaterialsPage() {
 
   return (
     <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b border-pathway-gold/20 px-4 bg-pathway-green/5">
         <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <h1 className="text-lg font-semibold">Materials</h1>
+        <Separator orientation="vertical" className="mr-2 h-4 bg-pathway-gold/30" />
+        <h1 className="text-lg font-semibold text-pathway-green">Materials</h1>
         <div className="ml-auto flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search materials..." className="pl-8 w-64" />
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-pathway-green/50" />
+            <Input
+              placeholder="Search materials..."
+              className="pl-8 w-64 border-pathway-gold/30 focus:border-pathway-gold"
+            />
           </div>
-          <Button size="sm">
+          <Button size="sm" className="bg-pathway-green hover:bg-pathway-green/90 text-pathway-cream">
             <Plus className="h-4 w-4 mr-2" />
             Add Material
           </Button>
@@ -67,23 +70,28 @@ export default function MaterialsPage() {
       <div className="flex-1 space-y-6 p-6">
         <div className="grid gap-6">
           {materials.map((material) => (
-            <Card key={material.id} className="hover:shadow-md transition-shadow">
+            <Card key={material.id} className="hover:shadow-md transition-shadow border-pathway-gold/20">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2">
-                      <Package className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-pathway-green">
+                      <Package className="h-5 w-5 text-pathway-gold" />
                       {material.name}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-4">
-                      <Badge variant="secondary">{material.category}</Badge>
-                      <span className="flex items-center gap-1">
+                      <Badge
+                        variant="secondary"
+                        className="bg-pathway-gold/20 text-pathway-green border-pathway-gold/30"
+                      >
+                        {material.category}
+                      </Badge>
+                      <span className="flex items-center gap-1 text-pathway-green/70">
                         <Leaf className="h-3 w-3 text-green-600" />
                         {material.recycledContent} recycled
                       </span>
                     </CardDescription>
                   </div>
-                  <Badge variant="outline" className="font-mono">
+                  <Badge variant="outline" className="font-mono border-pathway-gold text-pathway-green">
                     {material.emissionFactor}
                   </Badge>
                 </div>

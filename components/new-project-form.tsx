@@ -90,20 +90,29 @@ export function NewProjectForm({ open, onOpenChange }: NewProjectFormProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl border-pathway-gold/30">
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>Add a new construction project to track carbon emissions.</DialogDescription>
+          <DialogTitle className="text-pathway-green">Create New Project</DialogTitle>
+          <DialogDescription className="text-pathway-green/70">
+            Add a new construction project to track carbon emissions.
+          </DialogDescription>
         </DialogHeader>
 
         <form action={formAction} className="space-y-6">
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">
+                <Label htmlFor="name" className="text-pathway-green">
                   Project Name <span className="text-red-500">*</span>
                 </Label>
-                <Input id="name" name="name" placeholder="Enter project name" required disabled={isPending} />
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Enter project name"
+                  required
+                  disabled={isPending}
+                  className="border-pathway-gold/30 focus:border-pathway-gold"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="projectNumber">Project Number</Label>
@@ -170,7 +179,11 @@ export function NewProjectForm({ open, onOpenChange }: NewProjectFormProps) {
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="bg-pathway-green hover:bg-pathway-green/90 text-pathway-cream"
+            >
               {isPending ? "Creating..." : "Create Project"}
             </Button>
           </div>

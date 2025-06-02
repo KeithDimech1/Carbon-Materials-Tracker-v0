@@ -8,9 +8,9 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Carbon Tracker - Scope 3 Emissions Management",
-  description: "Track and manage carbon emissions in infrastructure projects",
-    generator: 'v0.dev'
+  title: "Pathway - Carbon Emissions Tracking",
+  description: "Track and manage carbon emissions in infrastructure projects with Pathway",
+  generator: "v0.dev",
 }
 
 export default function RootLayout({

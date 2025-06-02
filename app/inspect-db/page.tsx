@@ -46,19 +46,19 @@ export default async function InspectDatabasePage() {
 
   return (
     <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b border-pathway-gold/20 px-4 bg-pathway-green/5">
         <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <h1 className="text-lg font-semibold">Database Inspector</h1>
+        <Separator orientation="vertical" className="mr-2 h-4 bg-pathway-gold/30" />
+        <h1 className="text-lg font-semibold text-pathway-green">Database Inspector</h1>
       </header>
 
       <div className="flex-1 space-y-6 p-6">
         <div className="grid gap-6">
           {Object.entries(inspection).map(([table, info]) => (
-            <Card key={table}>
+            <Card key={table} className="border-pathway-gold/20">
               <CardHeader>
-                <CardTitle className="capitalize">{table}</CardTitle>
-                <CardDescription>
+                <CardTitle className="capitalize text-pathway-green">{table}</CardTitle>
+                <CardDescription className="text-pathway-green/70">
                   {info.error ? "Error accessing table" : `${info.columns?.length || 0} columns found`}
                 </CardDescription>
               </CardHeader>
@@ -73,7 +73,10 @@ export default async function InspectDatabasePage() {
                       <h4 className="font-medium mb-2">Columns:</h4>
                       <div className="flex flex-wrap gap-2">
                         {info.columns?.map((col) => (
-                          <span key={col} className="px-2 py-1 bg-muted rounded text-sm font-mono">
+                          <span
+                            key={col}
+                            className="px-2 py-1 bg-pathway-gold/20 text-pathway-green rounded text-sm font-mono border border-pathway-gold/30"
+                          >
                             {col}
                           </span>
                         ))}

@@ -39,7 +39,7 @@ export interface Database {
           principal_id?: number | null
           project_number?: string | null
           created_date?: string | null
-          project_status_id?: number | null
+          project_status_id?: string | null
         }
       }
       project_cost_codes: {
@@ -63,6 +63,52 @@ export interface Database {
           cost_code_name?: string
           description?: string | null
           cost_code_number?: string | null
+        }
+      }
+      locations: {
+        Row: {
+          location_id: number
+          project_id: number | null
+          location_name: string
+          description: string | null
+          location_number: string | null
+          latitude: number | null
+          longitude: number | null
+          location_type_id: string | null
+        }
+        Insert: {
+          location_id?: number
+          project_id?: number | null
+          location_name: string
+          description?: string | null
+          location_number?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          location_type_id?: string | null
+        }
+        Update: {
+          location_id?: number
+          project_id?: number | null
+          location_name?: string
+          description?: string | null
+          location_number?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          location_type_id?: string | null
+        }
+      }
+      location_types: {
+        Row: {
+          id: string
+          LocationType: string
+        }
+        Insert: {
+          id?: string
+          LocationType: string
+        }
+        Update: {
+          id?: string
+          LocationType?: string
         }
       }
       design_packages: {
@@ -248,34 +294,6 @@ export interface Database {
           project_id?: string
           code?: string
           description?: string | null
-          updated_at?: string
-        }
-      }
-      locations: {
-        Row: {
-          id: string
-          project_id: string
-          name: string
-          description: string | null
-          coordinates: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          project_id: string
-          name: string
-          description?: string | null
-          coordinates?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          project_id?: string
-          name?: string
-          description?: string | null
-          coordinates?: string | null
           updated_at?: string
         }
       }

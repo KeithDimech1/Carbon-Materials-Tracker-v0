@@ -1,10 +1,12 @@
 "use client"
 
-import { Building2, Package, Truck, Users, BarChart3, Settings, FileText, MapPin } from "lucide-react"
+import type * as React from "react"
+import { BarChart3, Building2, FileText, Home, Package, Settings, Users } from "lucide-react"
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -14,83 +16,103 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-const navigation = [
-  {
-    title: "Overview",
-    items: [
-      { title: "Dashboard", url: "/", icon: BarChart3 },
-      { title: "Projects", url: "/projects", icon: Building2 },
-    ],
-  },
-  {
-    title: "Data Management",
-    items: [
-      { title: "Deliveries", url: "/deliveries", icon: Truck },
-      { title: "Materials", url: "/materials", icon: Package },
-      { title: "Cost Codes", url: "/cost-codes", icon: FileText },
-      { title: "Locations", url: "/locations", icon: MapPin },
-    ],
-  },
-  {
-    title: "Administration",
-    items: [
-      { title: "Users", url: "/users", icon: Users },
-      { title: "Test Connection", url: "/test-connection", icon: Settings },
-      { title: "Inspect Database", url: "/inspect-db", icon: Settings },
-      { title: "Settings", url: "/settings", icon: Settings },
-    ],
-  },
-]
+// Update the navigation data to remove "Data Management" and update structure
+const data = {
+  navMain: [
+    {
+      title: "Dashboard",
+      url: "/",
+      icon: Home,
+    },
+    {
+      title: "Projects",
+      url: "/projects",
+      icon: Building2,
+    },
+    {
+      title: "Material Library",
+      url: "/material-library",
+      icon: Package,
+    },
+    {
+      title: "Reports",
+      url: "/reports",
+      icon: FileText,
+    },
+    {
+      title: "Analytics",
+      url: "/analytics",
+      icon: BarChart3,
+    },
+  ],
+  navSecondary: [
+    {
+      title: "Suppliers",
+      url: "/suppliers",
+      icon: Users,
+    },
+    {
+      title: "Settings",
+      url: "/settings",
+      icon: Settings,
+    },
+  ],
+}
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b border-border">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Building2 className="h-4 w-4" />
+    <Sidebar {...props}>
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-4 py-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pathway-green text-pathway-cream">
+            <BarChart3 className="h-4 w-4" />
           </div>
-          <div>
-            <p className="text-sm font-semibold">Carbon Tracker</p>
-            <p className="text-xs text-muted-foreground">Emissions Management</p>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold text-pathway-green">Pathway</span>
+            <span className="truncate text-xs text-muted-foreground">Carbon Tracking</span>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        {navigation.map((section) => (
-          <SidebarGroup key={section.title}>
-            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a href={item.url}>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        <SidebarGroup>
+          <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {data.navMain.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {data.navSecondary.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <div className="mt-auto border-t border-border p-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg?height=32&width=32" />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">John Doe</p>
-            <p className="text-xs text-muted-foreground">Principal</p>
-          </div>
-        </div>
-      </div>
+      <SidebarFooter>
+        <div className="p-4 text-xs text-muted-foreground">© 2024 Pathway Carbon Tracking</div>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
