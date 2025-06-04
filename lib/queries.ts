@@ -411,57 +411,66 @@ export async function getProjectStatuses() {
   }
 }
 
-// Materials library queries - Updated to match the actual schema
+// Materials library queries - Fixed to properly handle the relationships
 export async function getMaterialLibrary() {
   try {
-    // Get materials with explicit joins to related tables
-    const { data: materials, error } = await supabase
-      .from("materials")
-      .select(`
-        material_id,
-        material_name,
-        material_type_id,
-        material_subtype_id,
-        supplier_id,
-        generic_material_id,
-        unit_id,
-        embodied_co2_t_per_unit,
-        transport_mode_id,
-        material_evidence_url,
-        emission_source_id,
-        created_at,
-        created_by
-      `)
-      .order("material_name")
+    console.log("Starting getMaterialLibrary query...")
+
+    // Get materials with all their data
+    const { data: materials, error } = await supabase.from("materials").select("*").order("material_name")
 
     if (error) {
       console.error("Error fetching materials:", error)
       throw new Error(`Failed to fetch materials: ${error.message}`)
     }
 
+    console.log(`Found ${materials?.length || 0} materials`)
+
     if (!materials || materials.length === 0) {
       return []
     }
 
     // Get all the reference data we need for lookups
-    const results = await Promise.allSettled([
-      supabase.from("material_types").select("material_type_id, material_type_name"),
-      supabase.from("material_subtypes").select("material_subtype_id, material_subtype_name"),
-      supabase.from("suppliers").select("supplier_id, supplier_name"),
-      supabase.from("units").select("unit_id, unit_name, unit_symbol"),
-      supabase.from("generic_materials").select("generic_material_id, display_name"),
-      supabase.from("transport_modes").select("transport_mode_id, transport_mode_name"),
-      supabase.from("emission_source").select("source_id, emission_source_name"),
+    console.log("Fetching reference data...")
+
+    const [
+      materialTypesResult,
+      materialSubtypesResult,
+      suppliersResult,
+      unitsResult,
+      genericMaterialsResult,
+      transportModesResult,
+      emissionSourcesResult,
+    ] = await Promise.allSettled([
+      supabase.from("material_types").select("*"),
+      supabase.from("material_subtypes").select("*"),
+      supabase.from("suppliers").select("*"),
+      supabase.from("units").select("*"),
+      supabase.from("generic_materials").select("*"),
+      supabase.from("transport_modes").select("*"),
+      supabase.from("emission_source").select("*"),
     ])
 
     // Safely extract data from results
-    const materialTypes = results[0].status === "fulfilled" ? results[0].value.data || [] : []
-    const materialSubtypes = results[1].status === "fulfilled" ? results[1].value.data || [] : []
-    const suppliers = results[2].status === "fulfilled" ? results[2].value.data || [] : []
-    const units = results[3].status === "fulfilled" ? results[3].value.data || [] : []
-    const genericMaterials = results[4].status === "fulfilled" ? results[4].value.data || [] : []
-    const transportModes = results[5].status === "fulfilled" ? results[5].value.data || [] : []
-    const emissionSources = results[6].status === "fulfilled" ? results[6].value.data || [] : []
+    const materialTypes = materialTypesResult.status === "fulfilled" ? materialTypesResult.value.data || [] : []
+    const materialSubtypes =
+      materialSubtypesResult.status === "fulfilled" ? materialSubtypesResult.value.data || [] : []
+    const suppliers = suppliersResult.status === "fulfilled" ? suppliersResult.value.data || [] : []
+    const units = unitsResult.status === "fulfilled" ? unitsResult.value.data || [] : []
+    const genericMaterials =
+      genericMaterialsResult.status === "fulfilled" ? genericMaterialsResult.value.data || [] : []
+    const transportModes = transportModesResult.status === "fulfilled" ? transportModesResult.value.data || [] : []
+    const emissionSources = emissionSourcesResult.status === "fulfilled" ? emissionSourcesResult.value.data || [] : []
+
+    console.log("Reference data counts:", {
+      materialTypes: materialTypes.length,
+      materialSubtypes: materialSubtypes.length,
+      suppliers: suppliers.length,
+      units: units.length,
+      genericMaterials: genericMaterials.length,
+      transportModes: transportModes.length,
+      emissionSources: emissionSources.length,
+    })
 
     // Create lookup maps for reference data
     const materialTypeMap = new Map(materialTypes.map((t) => [t.material_type_id, t.material_type_name]))
@@ -472,27 +481,45 @@ export async function getMaterialLibrary() {
     const transportModeMap = new Map(transportModes.map((t) => [t.transport_mode_id, t.transport_mode_name]))
     const emissionSourceMap = new Map(emissionSources.map((e) => [e.source_id, e.emission_source_name]))
 
+    console.log("Processing materials with lookup data...")
+
     // Process the materials with their related data
     const processedMaterials = materials.map((material) => {
       const unit = unitMap.get(material.unit_id)
+      const materialType = materialTypeMap.get(material.material_type_id)
+      const materialSubtype = materialSubtypeMap.get(material.material_subtype_id)
+      const supplier = supplierMap.get(material.supplier_id)
+      const emissionSource = emissionSourceMap.get(material.emission_source_id)
+
+      console.log(`Processing material ${material.material_name}:`, {
+        material_type_id: material.material_type_id,
+        materialType,
+        supplier_id: material.supplier_id,
+        supplier,
+        unit_id: material.unit_id,
+        unit,
+      })
 
       return {
         material_id: material.material_id,
         material_name: material.material_name,
-        material_type: materialTypeMap.get(material.material_type_id) || null,
-        material_subtype: materialSubtypeMap.get(material.material_subtype_id) || null,
-        supplier: supplierMap.get(material.supplier_id) || null,
+        material_type: materialType || null,
+        material_subtype: materialSubtype || null,
+        supplier: supplier || null,
         generic_material: genericMaterialMap.get(material.generic_material_id) || null,
-        unit: unit?.symbol || unit?.name || null, // Use symbol first, fallback to name
+        unit: unit?.symbol || unit?.name || null,
         unit_symbol: unit?.symbol || null,
         embodied_co2_t_per_unit: material.embodied_co2_t_per_unit,
         transport_mode: transportModeMap.get(material.transport_mode_id) || null,
-        evidence_url: material.material_evidence_url, // Use the correct column name
-        emission_source: emissionSourceMap.get(material.emission_source_id) || null,
+        evidence_url: material.material_evidence_url,
+        emission_source: emissionSource || null,
         date_added: material.created_at,
         created_by: material.created_by,
       }
     })
+
+    console.log(`Processed ${processedMaterials.length} materials`)
+    console.log("Sample processed material:", processedMaterials[0])
 
     return processedMaterials
   } catch (error) {

@@ -6,13 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, MapPin, Calendar, Truck, Plus, BarChart3, Users, Building } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Truck, Plus, Building, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { DeliveriesInterface } from "./deliveries-interface"
-import { CarbonDashboard } from "./carbon-dashboard"
-import { ContractorsView } from "./contractors-view"
-import { SuppliersView } from "./suppliers-view"
-import { MonthlyDeliveriesTable } from "./monthly-deliveries-table"
+import { DeliveryErrors } from "./delivery-errors"
 
 interface ProjectDetailsClientProps {
   project: any
@@ -67,7 +64,7 @@ export function ProjectDetailsClient({
           <Card className="border-pathway-gold/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-pathway-green">Total Emissions</CardTitle>
-              <BarChart3 className="h-4 w-4 text-pathway-gold" />
+              <Truck className="h-4 w-4 text-pathway-gold" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-pathway-green">{totalEmissions.toFixed(1)} tCO₂e</div>
@@ -85,7 +82,7 @@ export function ProjectDetailsClient({
           <Card className="border-pathway-gold/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-pathway-green">Active Suppliers</CardTitle>
-              <Users className="h-4 w-4 text-pathway-gold" />
+              <Truck className="h-4 w-4 text-pathway-gold" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-pathway-green">{uniqueSuppliers}</div>
@@ -103,15 +100,27 @@ export function ProjectDetailsClient({
           </Card>
         </div>
 
+        {/* Add Delivery Button - Prominent */}
+        <div className="flex justify-center">
+          <Button
+            size="lg"
+            className="bg-pathway-green hover:bg-pathway-green/90 text-pathway-cream"
+            onClick={() => setActiveTab("deliveries")}
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Add Deliveries
+          </Button>
+        </div>
+
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="deliveries">Deliveries Information</TabsTrigger>
-            <TabsTrigger value="carbon">Carbon Dashboard</TabsTrigger>
-            <TabsTrigger value="contractors">Contractors</TabsTrigger>
-            <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly View</TabsTrigger>
+            <TabsTrigger value="delivery-errors">
+              <AlertTriangle className="h-4 w-4 mr-1" />
+              Delivery Errors
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -179,18 +188,10 @@ export function ProjectDetailsClient({
                   <Button
                     variant="outline"
                     className="w-full justify-start border-pathway-gold text-pathway-green hover:bg-pathway-green/10"
-                    onClick={() => setActiveTab("carbon")}
+                    onClick={() => setActiveTab("delivery-errors")}
                   >
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    View Carbon Dashboard
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-pathway-gold text-pathway-green hover:bg-pathway-green/10"
-                    onClick={() => setActiveTab("monthly")}
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Monthly Deliveries
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    View Delivery Errors
                   </Button>
                 </CardContent>
               </Card>
@@ -206,20 +207,8 @@ export function ProjectDetailsClient({
             />
           </TabsContent>
 
-          <TabsContent value="carbon">
-            <CarbonDashboard projectId={project.project_id} deliveries={deliveries} locations={locations} />
-          </TabsContent>
-
-          <TabsContent value="contractors">
-            <ContractorsView projectId={project.project_id} deliveries={deliveries} />
-          </TabsContent>
-
-          <TabsContent value="suppliers">
-            <SuppliersView projectId={project.project_id} deliveries={deliveries} />
-          </TabsContent>
-
-          <TabsContent value="monthly">
-            <MonthlyDeliveriesTable projectId={project.project_id} deliveries={deliveries} />
+          <TabsContent value="delivery-errors">
+            <DeliveryErrors projectId={project.project_id.toString()} />
           </TabsContent>
         </Tabs>
       </div>

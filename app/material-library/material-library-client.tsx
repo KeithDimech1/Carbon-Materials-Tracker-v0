@@ -43,6 +43,10 @@ export function MaterialLibraryClient({ materials = [] }: MaterialLibraryClientP
   const [selectedSupplier, setSelectedSupplier] = useState<string>("all")
   const [selectedEmissionSource, setSelectedEmissionSource] = useState<string>("all")
 
+  // Debug log the materials data
+  console.log("Materials data in client:", materials)
+  console.log("Sample material:", materials[0])
+
   // Get unique values for filters
   const { materialTypes, suppliers, emissionSources } = useMemo(() => {
     const types = new Set<string>()
@@ -59,6 +63,12 @@ export function MaterialLibraryClient({ materials = [] }: MaterialLibraryClientP
       if (material.emission_source) {
         sources.add(material.emission_source)
       }
+    })
+
+    console.log("Filter options:", {
+      materialTypes: Array.from(types),
+      suppliers: Array.from(supplierSet),
+      emissionSources: Array.from(sources),
     })
 
     return {
@@ -257,6 +267,9 @@ export function MaterialLibraryClient({ materials = [] }: MaterialLibraryClientP
         <div>
           <h2 className="text-2xl font-bold text-pathway-green">Material Library</h2>
           <p className="text-muted-foreground">Manage your materials and their emission factors</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Total materials: {materials.length} | Filtered: {filteredMaterials.length}
+          </p>
         </div>
         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
           <DialogTrigger asChild>
@@ -618,7 +631,7 @@ export function MaterialLibraryClient({ materials = [] }: MaterialLibraryClientP
                   <TableBody>
                     {filteredMaterials.map((material, index) => (
                       <TableRow key={material.material_id || index} className="h-12">
-                        <TableCell className="font-medium py-2">{material.material_name}</TableCell>
+                        <TableCell className="font-medium py-2">{material.material_name || "N/A"}</TableCell>
                         <TableCell className="py-2">{material.supplier || "N/A"}</TableCell>
                         <TableCell className="py-2">
                           {material.material_type ? <Badge variant="outline">{material.material_type}</Badge> : "N/A"}

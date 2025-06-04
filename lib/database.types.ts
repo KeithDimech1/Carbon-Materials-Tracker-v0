@@ -311,6 +311,88 @@ export interface Database {
           name?: string
         }
       }
+      raw_deliveries: {
+        Row: {
+          id: string
+          project_id: string
+          contractor_name: string | null
+          contractor_id: string | null
+          delivery_date: string | null
+          location_name: string | null
+          location_id: string | null
+          cost_code_name: string | null
+          cost_code_id: string | null
+          docket_number: string | null
+          material_type_name: string | null
+          material_type_id: string | null
+          supplier_name: string | null
+          supplier_id: string | null
+          material_name: string | null
+          material_id: string | null
+          unit_name: string | null
+          unit_id: string | null
+          quantity: number | null
+          total_cost: number | null
+          material_description: string | null
+          origin_postcode: string | null
+          validation_errors: string[] | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          contractor_name?: string | null
+          contractor_id?: string | null
+          delivery_date?: string | null
+          location_name?: string | null
+          location_id?: string | null
+          cost_code_name?: string | null
+          cost_code_id?: string | null
+          docket_number?: string | null
+          material_type_name?: string | null
+          material_type_id?: string | null
+          supplier_name?: string | null
+          supplier_id?: string | null
+          material_name?: string | null
+          material_id?: string | null
+          unit_name?: string | null
+          unit_id?: string | null
+          quantity?: number | null
+          total_cost?: number | null
+          material_description?: string | null
+          origin_postcode?: string | null
+          validation_errors?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          contractor_name?: string | null
+          contractor_id?: string | null
+          delivery_date?: string | null
+          location_name?: string | null
+          location_id?: string | null
+          cost_code_name?: string | null
+          cost_code_id?: string | null
+          docket_number?: string | null
+          material_type_name?: string | null
+          material_type_id?: string | null
+          supplier_name?: string | null
+          supplier_id?: string | null
+          material_name?: string | null
+          material_id?: string | null
+          unit_name?: string | null
+          unit_id?: string | null
+          quantity?: number | null
+          total_cost?: number | null
+          material_description?: string | null
+          origin_postcode?: string | null
+          validation_errors?: string[] | null
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

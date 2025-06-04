@@ -13,7 +13,7 @@ export default async function MaterialLibraryPage() {
     return (
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-pathway-gold/20 px-4 bg-pathway-green/5">
-          <SidebarTrigger className="-ml-1" />
+          <SidebarTrigger className="-ml-1 text-pathway-green" />
           <Separator orientation="vertical" className="mr-2 h-4 bg-pathway-gold/30" />
           <h1 className="text-lg font-semibold text-pathway-green">Material Library</h1>
           <div className="ml-auto">
@@ -32,7 +32,7 @@ export default async function MaterialLibraryPage() {
     return (
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-pathway-gold/20 px-4 bg-pathway-green/5">
-          <SidebarTrigger className="-ml-1" />
+          <SidebarTrigger className="-ml-1 text-pathway-green" />
           <Separator orientation="vertical" className="mr-2 h-4 bg-pathway-gold/30" />
           <h1 className="text-lg font-semibold text-pathway-green">Material Library</h1>
         </header>
@@ -40,19 +40,19 @@ export default async function MaterialLibraryPage() {
         <div className="flex-1 p-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Database className="h-5 w-5 mr-2" />
+              <CardTitle className="flex items-center text-pathway-green">
+                <Database className="h-5 w-5 mr-2 text-pathway-gold" />
                 Material Library
               </CardTitle>
               <CardDescription>Centralized repository of materials and their carbon emission factors</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center py-8">
-              <Package className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Error Loading Materials</h3>
+              <Package className="h-16 w-16 text-pathway-gold mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-pathway-green">Error Loading Materials</h3>
               <p className="text-muted-foreground mb-4 text-center max-w-md">
                 There was an error loading the material library. Please check your database connection.
               </p>
-              <Button asChild>
+              <Button asChild className="bg-pathway-green hover:bg-pathway-green/90 text-pathway-cream">
                 <a href="/test-connection">Test Connection</a>
               </Button>
             </CardContent>

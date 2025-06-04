@@ -38,11 +38,11 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Pathway brand colors */
-    --pathway-green: 158 64% 52%;
-    --pathway-cream: 45 29% 97%;
-    --pathway-gold: 45 93% 47%;
-    --pathway-dark-green: 158 64% 42%;
+    /* Pathway brand colors - updated to match the logo */
+    --pathway-green: 120 61% 16%; /* Dark green background */
+    --pathway-cream: 48 56% 91%; /* Cream text color */
+    --pathway-gold: 43 74% 49%; /* Gold mountain color */
+    --pathway-dark-green: 120 61% 12%; /* Darker green for contrast */
   }
 
   .dark {
@@ -70,20 +70,20 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 94.1%;
-    --sidebar-primary-foreground: 240 5.9% 10%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 120 61% 16%; /* Dark green background */
+    --sidebar-foreground: 48 56% 91%; /* Cream text color */
+    --sidebar-primary: 48 56% 91%; /* Cream text color */
+    --sidebar-primary-foreground: 120 61% 16%; /* Dark green background */
+    --sidebar-accent: 120 61% 20%; /* Slightly lighter green for hover */
+    --sidebar-accent-foreground: 48 56% 91%; /* Cream text color */
+    --sidebar-border: 120 61% 20%; /* Slightly lighter green for borders */
+    --sidebar-ring: 43 74% 49%; /* Gold accent color */
 
-    /* Pathway brand colors for dark mode */
-    --pathway-green: 158 64% 52%;
-    --pathway-cream: 45 29% 97%;
-    --pathway-gold: 45 93% 47%;
-    --pathway-dark-green: 158 64% 42%;
+    /* Pathway brand colors for dark mode - same as light mode for consistency */
+    --pathway-green: 120 61% 16%; /* Dark green background */
+    --pathway-cream: 48 56% 91%; /* Cream text color */
+    --pathway-gold: 43 74% 49%; /* Gold mountain color */
+    --pathway-dark-green: 120 61% 12%; /* Darker green for contrast */
   }
 }
 

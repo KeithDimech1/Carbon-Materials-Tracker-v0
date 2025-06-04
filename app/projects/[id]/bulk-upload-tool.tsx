@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,8 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Download } from "lucide-react"
+import { bulkUploadDeliveries, generateDeliveryTemplate } from "@/app/actions/bulk-deliveries"
 
 interface BulkUploadToolProps {
   projectId: string
@@ -23,19 +22,20 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
   const [csvHeaders, setCsvHeaders] = useState<string[]>([])
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({})
   const [validationResults, setValidationResults] = useState<any[]>([])
+  const [uploadResult, setUploadResult] = useState<any>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   // Platform field definitions
   const platformFields = [
     { key: "contractor", label: "Contractor", required: true },
     { key: "delivery_date", label: "Delivery Date", required: true },
     { key: "site", label: "Site", required: true },
-    { key: "package", label: "Package", required: false },
     { key: "cost_code", label: "Cost Code", required: true },
     { key: "docket_number", label: "Docket Number", required: false },
     { key: "material_type", label: "Material Type", required: true },
-    { key: "supplier", label: "Supplied By", required: true },
+    { key: "supplier", label: "Supplier", required: true },
     { key: "material", label: "Material", required: true },
-    { key: "unit", label: "Specific Unit", required: true },
+    { key: "unit", label: "Unit", required: true },
     { key: "quantity", label: "Quantity", required: true },
     { key: "total_cost", label: "Total Cost", required: false },
     { key: "material_description", label: "Material Description", required: false },
@@ -49,7 +49,7 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
     const reader = new FileReader()
     reader.onload = (e) => {
       const text = e.target?.result as string
-      const lines = text.split("\n")
+      const lines = text.split("\n").filter((line) => !line.startsWith("#")) // Filter out comment lines
       const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""))
       const data = lines
         .slice(1)
@@ -82,33 +82,12 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
 
     // Process data with mapping
     const mappedData = csvData.map((row, index) => {
-      const mappedRow: any = { originalIndex: index, errors: [], warnings: [] }
+      const mappedRow: any = { originalIndex: index }
 
       platformFields.forEach((field) => {
         const csvColumn = columnMapping[field.key]
         if (csvColumn) {
           mappedRow[field.key] = row[csvColumn]
-
-          // Basic validation
-          if (field.required && !mappedRow[field.key]) {
-            mappedRow.errors.push(`${field.label} is required`)
-          }
-
-          // Date validation
-          if (field.key === "delivery_date" && mappedRow[field.key]) {
-            const date = new Date(mappedRow[field.key])
-            if (isNaN(date.getTime())) {
-              mappedRow.errors.push(`Invalid date format for ${field.label}`)
-            }
-          }
-
-          // Quantity validation
-          if (field.key === "quantity" && mappedRow[field.key]) {
-            const quantity = Number.parseFloat(mappedRow[field.key])
-            if (isNaN(quantity) || quantity <= 0) {
-              mappedRow.errors.push(`Invalid quantity: must be a positive number`)
-            }
-          }
         }
       })
 
@@ -119,43 +98,40 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
     setUploadStep("validation")
   }
 
-  const handleImport = () => {
-    // Filter out rows with errors
-    const validRows = validationResults.filter((row) => row.errors.length === 0)
-
-    // Here you would make API calls to import the data
-    console.log("Importing rows:", validRows)
-
-    setUploadStep("complete")
+  const handleImport = async () => {
+    setIsUploading(true)
+    try {
+      const result = await bulkUploadDeliveries(projectId, validationResults)
+      setUploadResult(result)
+      setUploadStep("complete")
+    } catch (error) {
+      console.error("Upload error:", error)
+      setUploadResult({
+        success: false,
+        validDeliveries: 0,
+        invalidDeliveries: 0,
+        errors: ["Upload failed. Please try again."],
+      })
+      setUploadStep("complete")
+    } finally {
+      setIsUploading(false)
+    }
   }
 
-  const downloadTemplate = () => {
-    const headers = platformFields.map((f) => f.label).join(",")
-    const sampleRow = [
-      "BuildCorp Ltd.",
-      "2024-01-15",
-      "Foundation Block A",
-      "Package 1",
-      "CC-001-STR",
-      "DOC-12345",
-      "Concrete",
-      "ABC Concrete Co.",
-      "40 MPa Concrete",
-      "m³",
-      "125.5",
-      "15000",
-      "High strength concrete for foundations",
-      "2000",
-    ].join(",")
-
-    const csvContent = `${headers}\n${sampleRow}`
-    const blob = new Blob([csvContent], { type: "text/csv" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "delivery_template.csv"
-    a.click()
-    window.URL.revokeObjectURL(url)
+  const downloadTemplate = async () => {
+    try {
+      const csvContent = await generateDeliveryTemplate(projectId)
+      const blob = new Blob([csvContent], { type: "text/csv" })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `delivery_template_project_${projectId}.csv`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Error generating template:", error)
+      alert("Failed to generate template. Please try again.")
+    }
   }
 
   return (
@@ -174,7 +150,7 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
           <div className="flex justify-center">
             <Button variant="outline" onClick={downloadTemplate}>
               <Download className="h-4 w-4 mr-2" />
-              Download Template
+              Download Template with Lookup Data
             </Button>
           </div>
         </div>
@@ -219,7 +195,7 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
             <Button variant="outline" onClick={() => setUploadStep("upload")}>
               Back
             </Button>
-            <Button onClick={handleMapping}>Validate Data</Button>
+            <Button onClick={handleMapping}>Preview Data</Button>
           </div>
         </div>
       )}
@@ -227,33 +203,14 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
       {uploadStep === "validation" && (
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold mb-2">Validation Results</h3>
-            <p className="text-muted-foreground mb-4">Review the validation results before importing</p>
+            <h3 className="text-lg font-semibold mb-2">Preview Upload Data</h3>
+            <p className="text-muted-foreground mb-4">
+              Review the data before uploading. Invalid entries will be saved to the delivery errors section for manual
+              review.
+            </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3 mb-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="font-semibold">{validationResults.filter((r) => r.errors.length === 0).length}</p>
-                    <p className="text-sm text-muted-foreground">Valid Records</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                  <div>
-                    <p className="font-semibold">{validationResults.filter((r) => r.errors.length > 0).length}</p>
-                    <p className="text-sm text-muted-foreground">Invalid Records</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid gap-4 md:grid-cols-2 mb-4">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
@@ -265,6 +222,17 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
                 </div>
               </CardContent>
             </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-amber-500" />
+                  <div>
+                    <p className="font-semibold">Auto-Validation</p>
+                    <p className="text-sm text-muted-foreground">Will check against database</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="max-h-96 overflow-y-auto">
@@ -272,32 +240,22 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Row</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Contractor</TableHead>
                   <TableHead>Material</TableHead>
+                  <TableHead>Supplier</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Issues</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {validationResults.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{row.originalIndex + 1}</TableCell>
-                    <TableCell>
-                      {row.errors.length === 0 ? (
-                        <Badge variant="outline" className="text-green-600 border-green-600">
-                          Valid
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive">Invalid</Badge>
-                      )}
-                    </TableCell>
+                    <TableCell>{row.contractor || "N/A"}</TableCell>
                     <TableCell>{row.material || "N/A"}</TableCell>
+                    <TableCell>{row.supplier || "N/A"}</TableCell>
                     <TableCell>{row.quantity || "N/A"}</TableCell>
                     <TableCell>{row.delivery_date || "N/A"}</TableCell>
-                    <TableCell>
-                      {row.errors.length > 0 && <div className="text-sm text-red-600">{row.errors.join(", ")}</div>}
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -308,11 +266,8 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
             <Button variant="outline" onClick={() => setUploadStep("mapping")}>
               Back
             </Button>
-            <Button
-              onClick={handleImport}
-              disabled={validationResults.filter((r) => r.errors.length === 0).length === 0}
-            >
-              Import Valid Records
+            <Button onClick={handleImport} disabled={isUploading}>
+              {isUploading ? "Uploading..." : "Upload Deliveries"}
             </Button>
           </div>
         </div>
@@ -320,11 +275,31 @@ export function BulkUploadTool({ projectId, onClose }: BulkUploadToolProps) {
 
       {uploadStep === "complete" && (
         <div className="text-center space-y-4">
-          <CheckCircle className="h-16 w-16 mx-auto text-green-500" />
-          <h3 className="text-lg font-semibold">Import Complete</h3>
-          <p className="text-muted-foreground">
-            Successfully imported {validationResults.filter((r) => r.errors.length === 0).length} delivery records
-          </p>
+          {uploadResult?.success ? (
+            <>
+              <CheckCircle className="h-16 w-16 mx-auto text-green-500" />
+              <h3 className="text-lg font-semibold">Upload Complete</h3>
+              <div className="space-y-2">
+                <p className="text-muted-foreground">
+                  Successfully processed {uploadResult.validDeliveries + uploadResult.invalidDeliveries} records
+                </p>
+                {uploadResult.validDeliveries > 0 && (
+                  <p className="text-green-600">✓ {uploadResult.validDeliveries} deliveries added to project</p>
+                )}
+                {uploadResult.invalidDeliveries > 0 && (
+                  <p className="text-amber-600">
+                    ⚠ {uploadResult.invalidDeliveries} entries saved to delivery errors for manual review
+                  </p>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <AlertCircle className="h-16 w-16 mx-auto text-red-500" />
+              <h3 className="text-lg font-semibold">Upload Failed</h3>
+              <p className="text-muted-foreground">{uploadResult?.errors?.[0] || "An error occurred during upload"}</p>
+            </>
+          )}
           <Button onClick={onClose}>Close</Button>
         </div>
       )}

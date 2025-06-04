@@ -2,6 +2,7 @@
 
 import type * as React from "react"
 import { BarChart3, Building2, FileText, Home, Package, Settings, Users } from "lucide-react"
+import Image from "next/image"
 
 import {
   Sidebar,
@@ -62,28 +63,30 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar {...props}>
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pathway-green text-pathway-cream">
-            <BarChart3 className="h-4 w-4" />
-          </div>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold text-pathway-green">Pathway</span>
-            <span className="truncate text-xs text-muted-foreground">Carbon Tracking</span>
+    <Sidebar {...props} className="bg-pathway-green">
+      <SidebarHeader className="bg-pathway-green">
+        <div className="flex items-center gap-2 px-4 py-4">
+          <div className="flex items-center justify-center">
+            <Image
+              src="/images/pathway-logo.png"
+              alt="Pathway Logo"
+              width={150}
+              height={60}
+              className="object-contain"
+            />
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-pathway-green">
         <SidebarGroup>
-          <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-pathway-cream">Main Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {data.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="text-pathway-cream hover:bg-pathway-dark-green">
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="text-pathway-gold" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -93,14 +96,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-pathway-cream">Management</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {data.navSecondary.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="text-pathway-cream hover:bg-pathway-dark-green">
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="text-pathway-gold" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -110,8 +113,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <div className="p-4 text-xs text-muted-foreground">© 2024 Pathway Carbon Tracking</div>
+      <SidebarFooter className="bg-pathway-green">
+        <div className="p-4 text-xs text-pathway-cream">© 2024 Pathway Carbon Tracking</div>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
